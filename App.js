@@ -1,20 +1,68 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, View,FlatList,Button} from 'react-native';
+
+import GoalItems from './components/GoalItems';
+import GoalInput from './components/GoalInputs';
 
 export default function App() {
+    const[modalIsVisible,setModalIsVisible]=useState(false);
+   const [courseGoals,setCourseGoals]=useState([]);
+
+  function startAddGoalHandaler(){
+    setModalIsVisible(true)
+  }
+function endAddGoalHandaler(){
+  setModalIsVisible(false)
+}
+
+  function addInputHandaler(enterGoal){
+    setCourseGoals(currentCourseGoals=>[...currentCourseGoals,
+      {text:enterGoal,id:Math.random().toString()}
+    ])
+    endAddGoalHandaler()
+  };
+ 
+  function deleteGoal(id){
+   setCourseGoals(currentCourseGoals=>{
+    return currentCourseGoals.filter((goal)=> goal.id !==id);
+   })
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+   <>
+   <StatusBar style="light" />
+   <View style={styles.appContainer}>
+
+<Button title='add new goal' color="pink" onPress={startAddGoalHandaler}/>
+
+<GoalInput visible={modalIsVisible} onAddGoal={addInputHandaler} onCancel={endAddGoalHandaler}></GoalInput>
+
+<View style={styles.goalsContainer}>
+<FlatList data={courseGoals} renderItem={(itemData)=>{
+
+return <GoalItems text={itemData.item.text} id={itemData.item.id} onDelete={deleteGoal}></GoalItems>
+}} 
+keyExtractor={(item,index)=>{
+  return item.id
+}}
+alwaysBounceVertical={false} />
+</View>
+</View>
+   </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  appContainer:{
+    flex:1,
+    paddingTop:50,
+    paddingHorizontal:16,
+    backgroundColor:"yellow"
   },
+
+  goalsContainer:{
+    flex:5,
+  },
+ 
 });
